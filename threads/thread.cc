@@ -223,10 +223,11 @@ Thread::Yield ()
 
     int RemainingBurstTime=this->getRemainingBurstTime(); // update remaining burst time
     int RunTime=this->getRunTime();
-    DEBUG(dbgMach,"[UpdateRemainingBurstTime] Tick ["<<kernel->stats->totalTicks<<"]: Thread ["<<this->getID()<<"] update remaining burst time, from: ["<<RemainingBurstTime<<"] - ["<<RunTime<<"], to ["<<RemainingBurstTime-RunTime<<"]");
+    DEBUG('z',"[UpdateRemainingBurstTime] Tick ["<<kernel->stats->totalTicks<<"]: Thread ["<<this->getID()<<"] update remaining burst time, from: ["<<RemainingBurstTime<<"] - ["<<RunTime<<"], to ["<<RemainingBurstTime-RunTime<<"]");
     this->setRemainingBurstTime(RemainingBurstTime -RunTime); 
     //context switch
-    DEBUG(dbgMach,"[ContextSwitch] Tick ["<<kernel->stats->totalTicks<<"]: Thread ["<<nextThread->getID()<<"] is now selected for execution, thread ["<<this->getID()<<"] is replaced, and it has executed ["<<RunTime<<"] ticks");
+    DEBUG('z',"[ContextSwitch] Tick ["<<kernel->stats->totalTicks<<"]: Thread ["<<nextThread->getID()<<"] is now selected for execution, thread ["<<this->getID()<<"] is replaced, and it has executed ["<<RunTime<<"] ticks");
+    this->setRRTime(0);
     this->setRunTime(0); // reset runtime for currentthread
     this->setWaitTime(0); // reset waittime for currentthread
     kernel->scheduler->Run(nextThread, 0); // finishing = 0
@@ -276,9 +277,10 @@ Thread::Sleep (bool finishing)
 
     int RemainingBurstTime=this->getRemainingBurstTime();
     int RunTime=this->getRunTime();
-    DEBUG(dbgMach,"[UpdateRemainingBurstTime] Tick ["<<kernel->stats->totalTicks<<"]: Thread ["<<this->getID()<<"] update remaining burst time, from: ["<<RemainingBurstTime<<"] - ["<<RunTime<<"], to ["<<RemainingBurstTime-RunTime<<"]");
+    DEBUG('z',"[UpdateRemainingBurstTime] Tick ["<<kernel->stats->totalTicks<<"]: Thread ["<<this->getID()<<"] update remaining burst time, from: ["<<RemainingBurstTime<<"] - ["<<RunTime<<"], to ["<<RemainingBurstTime-RunTime<<"]");
     // 2. Reset some value of current_thread, then context switch
     this->setStatus(BLOCKED);
+    this->setRRTime(0);
     this->setRunTime(0);
     this->setWaitTime(0);
     kernel->scheduler->Run(nextThread, finishing);

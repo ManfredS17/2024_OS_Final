@@ -196,6 +196,8 @@ UserProgKernel::InitializeOneThread(char* name, int priority, int burst_time)
     t[threadNum]->setPriority(priority);
     t[threadNum]->setRemainingBurstTime(burst_time);
 
+    //cout << t[threadNum]->getName() << " " << t[threadNum]->getPriority() << " " << t[threadNum]->getRemainingBurstTime() << "\n";
+
     t[threadNum]->space = new AddrSpace();
     t[threadNum]->Fork((VoidFunctionPtr) &ForkExecute, (void *)t[threadNum]);
     //<TODO>
