@@ -217,7 +217,7 @@ Scheduler::Run (Thread *nextThread, bool finishing)
     // a bit to figure out what happens after this, both from the point
     // of view of the thread and from the perspective of the "outside world".
 
-    //cout << "Switching from: " << oldThread->getID() << " to: " << nextThread->getID() << endl;
+    cout << "Switching from: " << oldThread->getID() << " to: " << nextThread->getID() << endl;
     SWITCH(oldThread, nextThread);
 
     // we're back, running oldThread
@@ -300,7 +300,10 @@ Scheduler::UpdatePriority()
             thread->setWaitTime(0);
         }
         if (thread->getPriority() >49) {
+            L3ReadyQueue->Remove(thread);
+            DEBUG('z',"[RemoveFromQueue] Tick ["<<kernel->stats->totalTicks<<"]: Thread ["<<thread->getID()<<"] removed from queue L[3]\n");
             L2ReadyQueue->Insert(thread);
+            DEBUG('z',"[RemoveFromQueue] Tick ["<<kernel->stats->totalTicks<<"]: Thread ["<<thread->getID()<<"] is insert into queue L[2]\n");
         }
         iterL3->Next();
     }
@@ -321,7 +324,10 @@ Scheduler::UpdatePriority()
         }
         if (thread->getPriority() >99) 
         {
+            L2ReadyQueue->Remove(thread);
+            DEBUG('z',"[RemoveFromQueue] Tick ["<<kernel->stats->totalTicks<<"]: Thread ["<<thread->getID()<<"] removed from queue L[2]\n");
             L1ReadyQueue->Insert(thread);
+            DEBUG('z',"[RemoveFromQueue] Tick ["<<kernel->stats->totalTicks<<"]: Thread ["<<thread->getID()<<"] is insert into queue L[1]\n");
         }
         iterL2->Next();
     }

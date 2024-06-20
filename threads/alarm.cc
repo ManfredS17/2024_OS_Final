@@ -58,20 +58,23 @@ Alarm::CallBack()
     //<TODO>(wait debug)
 
     // In each 100 ticks, 
-    if (stats->totalTicks % 100 == 0 && stats->totalTicks != 0)
-    {
+    //if ((newTicks - oldTicks) >=100)
+    //{
         // 1. Update Priority
         kernel->scheduler->UpdatePriority();
         // 2. Update RunTime & RRTime
         thread->setRunTime(thread->getRunTime() + 100);
-        thread->setRRTime(thread->getRRTime() + 100);
+        if(thread->getPriority() < 50)
+        {
+            thread->setRRTime(thread->getRRTime() + 100);
+        }
         // 3. Check Round Robin (only L3)
         if(thread->getPriority() < 50 && thread->getRRTime() >= 200)
         {
             //thread->Yield();
             interrupt->YieldOnReturn();
         }
-    }
+    //}
     //<TODO>
 
     /* 
