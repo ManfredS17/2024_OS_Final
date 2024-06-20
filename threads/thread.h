@@ -54,7 +54,7 @@
 // For simplicity, I just take the maximum over all architectures.
 
 #define MachineStateSize 75 
-
+#define USER_PROGRAM
 
 // Size of the thread's private execution stack.
 // WATCH OUT IF THIS ISN'T BIG ENOUGH!!!!!
