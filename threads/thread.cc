@@ -220,7 +220,13 @@ Thread::Yield ()
     nextThread = kernel->scheduler->FindNextToRun();
     // 3. After resetting some value of current_thread, then context switch
     this->setStatus(READY);
-    this->setRemainingBurstTime(this->getRemainingBurstTime() - this->getRunTime()); // update remaining burst time
+
+    int RemainingBurstTime=this->getRemainingBurstTime(); // update remaining burst time
+    int RunTime=this->getRunTime();
+    DEBUG(dbgMach,"[UpdateRemainingBurstTime] Tick ["<<kernel->stats->totalTicks<<"]: Thread ["<<this->getID()<<"] update remaining burst time, from: ["<<RemainingBurstTime<<"] - ["<<RunTime<<"], to ["<<RemainingBurstTime-RunTime<<"]");
+    this->setRemainingBurstTime(RemainingBurstTime -RunTime); 
+    //context switch
+    DEBUG(dbgMach,"[ContextSwitch] Tick ["<<kernel->stats->totalTicks<<"]: Thread ["<<nextThread->getID()<<"] is now selected for execution, thread ["<<this->getID()<<"] is replaced, and it has executed ["<<RunTime<<"] ticks");
     this->setRunTime(0); // reset runtime for currentthread
     this->setWaitTime(0); // reset waittime for currentthread
     kernel->scheduler->Run(nextThread, 0); // finishing = 0
@@ -267,7 +273,10 @@ Thread::Sleep (bool finishing)
     // In Thread::Sleep(finishing), we put the current_thread to waiting or terminated state (depend on finishing)
     // , and determine finishing on Scheduler::Run(nextThread, finishing), not here.
     // 1. Update RemainingBurstTime
-    this->setRemainingBurstTime(this->getRemainingBurstTime() - this->getRunTime());
+
+    int RemainingBurstTime=this->getRemainingBurstTime();
+    int RunTime=this->getRunTime();
+    DEBUG(dbgMach,"[UpdateRemainingBurstTime] Tick ["<<kernel->stats->totalTicks<<"]: Thread ["<<this->getID()<<"] update remaining burst time, from: ["<<RemainingBurstTime<<"] - ["<<RunTime<<"], to ["<<RemainingBurstTime-RunTime<<"]");
     // 2. Reset some value of current_thread, then context switch
     this->setStatus(BLOCKED);
     this->setRunTime(0);
