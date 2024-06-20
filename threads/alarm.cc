@@ -52,32 +52,53 @@ Alarm::CallBack()
     Interrupt *interrupt = kernel->interrupt;
     MachineStatus status = interrupt->getStatus();
 
-
+    Statistics* stats = kernel->stats;
     Thread* thread = kernel->currentThread;
 
     //<TODO>(wait debug)
-    Statistics* stats = kernel->stats;
+
     // In each 100 ticks, 
-    if (stats->totalTicks % 100 == 0 && stats->totalTicks != 0)
+    if (stats->totalTicks % 100 == 0)
     {
         // 1. Update Priority
-        kernel->scheduler->UpdatePriority();
+        if(stats->totalTicks != 0)
+        {
+            kernel->scheduler->UpdatePriority();
+        }
+        //printf("Tick %d\n", stats->totalTicks);
+        //printf("thread %d\n", thread->getID());
+        //printf("priority %d\n", thread->getPriority());
         // 2. Update RunTime & RRTime
-        thread->setRunTime(thread->getRunTime() + 100);
+        if(thread->getStatus() == RUNNING)
+        {
+            thread->setRunTime(thread->getRunTime() + 100);
+        }
         // 3. Check Round Robin (only L3)
         if(thread->getPriority() < 50 && thread->getRunTime() >= 200)
         {
-            thread->Yield();
+            //thread->Yield();
+            interrupt->YieldOnReturn();
         }
     }
     //<TODO>
-    
-    if (status == IdleMode) {    // is it time to quit?
-         if (!interrupt->AnyFutureInterrupts()) {
+
+    //debug
+    while(stats->totalTicks >= 10000)
+    {
+        
+    }
+    /* 
+    if (status == IdleMode) 
+    {    // is it time to quit?
+        if (!interrupt->AnyFutureInterrupts()) 
+        {
             timer->Disable(); // turn off the timer
-     }
-     } else {         // there's someone to preempt
+        }
+    } 
+    else 
+    {         // there's someone to preempt
         interrupt->YieldOnReturn();
-     }
+    }
+    */
 }
 

@@ -194,7 +194,6 @@ AddrSpace::Execute(char *fileName)
     Statistics* stats = kernel->stats;
     DEBUG(dbgMLFQ, "[AddrSpace::Execute over] Tick [" << stats->totalTicks << "]: Thread [" << kernel->currentThread->getID() << "]");
     kernel->machine->Run();		// jump to the user progam
-
     // ASSERTNOTREACHED();			// machine->Run never returns;
 					// the address space exits
 					// by doing the syscall "exit"

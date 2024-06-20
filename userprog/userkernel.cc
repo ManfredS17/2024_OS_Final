@@ -34,10 +34,12 @@ UserProgKernel::UserProgKernel(int argc, char **argv)
 		else if (strcmp(argv[i], "-e") == 0) {
 			execfile[++execfileNum]= argv[++i];
 		}
-		//<TODO>
+		//<TODO>(wait debug)
         // Get execfile & its priority & burst time from argv, then save them.
 		else if (strcmp(argv[i], "-epb") == 0) {
-
+			execfile[++execfileNum]= argv[++i];
+            threadPriority[execfileNum] = atoi(argv[++i]);
+            threadRemainingBurstTime[execfileNum] = atoi(argv[++i]);
 	    }
 	    //<TODO>
 	    else if (strcmp(argv[i], "-u") == 0) {
@@ -69,7 +71,8 @@ UserProgKernel::Initialize()
 
     machine = new Machine(debugUserProg);
     fileSystem = new FileSystem();
-
+    //init threadNum
+    //threadNum = 0;
 
     currentThread = new Thread("main", threadNum++);	
     synchConsoleIn = new SynchConsoleInput(consoleIn);
@@ -167,26 +170,36 @@ UserProgKernel::SelfTest() {
 
 //	cout << "This is self test message from UserProgKernel\n" ;
 }
+
+
 void
 ForkExecute(Thread *t)
 {
-
+    // cout << "Thread: " << (void *) t << endl;
     //<TODO>
     // When Thread t goes to Running state in the first time, its file should be loaded & executed.
     // Hint: This function would not be called until Thread t is on running state.
-    //<TODO>
+    t->space->Load(t->getName());
     t->space->Execute(t->getName());
+    //<TODO>
 }
 
 int 
 UserProgKernel::InitializeOneThread(char* name, int priority, int burst_time)
 {
+    //debug
+    //printf("%d\n", priority);
     //<TODO>
     // When each execfile comes to Exec function, Kernel helps to create a thread for it.
     // While creating a new thread, thread should be initialized, and then forked.
-    t[threadNum]= new Thread(name,threadNum);
+    t[threadNum] = new Thread(name, threadNum);
+    t[threadNum]->setPriority(priority);
+    t[threadNum]->setRemainingBurstTime(burst_time);
+
+    t[threadNum]->space = new AddrSpace();
     t[threadNum]->Fork((VoidFunctionPtr) &ForkExecute, (void *)t[threadNum]);
     //<TODO>
+
     threadNum++;
     return threadNum - 1;
 }
@@ -194,10 +207,11 @@ UserProgKernel::InitializeOneThread(char* name, int priority, int burst_time)
 void 
 UserProgKernel::InitializeAllThreads()
 {
+    //cout << execfileNum << "\n";
     for (int i = 1; i <= execfileNum; i++){
-        // cout << "execfile[" << i << "]: " << execfile[i] << " start " << endl;
+         //cout << "execfile[" << i << "]: " << execfile[i] << " start " << endl;
         int a = InitializeOneThread(execfile[i], threadPriority[i], threadRemainingBurstTime[i]);
-        // cout << "execfile[" << i << "]: " << execfile[i] << " end "<< endl;
+         //cout << "execfile[" << i << "]: " << execfile[i] << " end "<< endl;
     }
     // After InitializeAllThreads(), let main thread be terminated that we can start to run our thread.
     currentThread->Finish();
