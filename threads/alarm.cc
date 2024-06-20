@@ -58,8 +58,6 @@ Alarm::CallBack()
     //<TODO>(wait debug)
 
     // In each 100 ticks, 
-    //if ((newTicks - oldTicks) >=100)
-    //{
         // 1. Update Priority
         kernel->scheduler->UpdatePriority();
         // 2. Update RunTime & RRTime
@@ -74,7 +72,6 @@ Alarm::CallBack()
             //thread->Yield();
             interrupt->YieldOnReturn();
         }
-    //}
     //<TODO>
 
     /* 

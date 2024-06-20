@@ -95,19 +95,19 @@ Scheduler::ReadyToRun (Thread *thread)
     int Priority=thread->getPriority();
     if(Priority >=0 && Priority < 50)
     {
-        DEBUG('z', "[InsertToQueue] Tick ["<<kernel->stats->totalTicks<<"]: Thread ["<<thread->getID()<<"] is inserted into queue L[3]\n");
+        DEBUG('z', "[InsertToQueue] Tick ["<<kernel->stats->totalTicks<<"]: Thread ["<<thread->getID()<<"] is inserted into queue L[3]");
         thread->setStatus(READY);
         L3ReadyQueue->Append(thread);
     }
     else if(Priority < 100)
     {
-        DEBUG('z',"[InsertToQueue] Tick ["<<kernel->stats->totalTicks<<"]: Thread ["<<thread->getID()<<"] is inserted into queue L[2]\n");
+        DEBUG('z',"[InsertToQueue] Tick ["<<kernel->stats->totalTicks<<"]: Thread ["<<thread->getID()<<"] is inserted into queue L[2]");
         thread->setStatus(READY);
         L2ReadyQueue->Insert(thread);
     }
     else if(Priority < 150)
     {
-        DEBUG('z',"[InsertToQueue] Tick ["<<kernel->stats->totalTicks<<"]: Thread ["<<thread->getID()<<"] is inserted into queue L[1]\n");
+        DEBUG('z',"[InsertToQueue] Tick ["<<kernel->stats->totalTicks<<"]: Thread ["<<thread->getID()<<"] is inserted into queue L[1]");
         thread->setStatus(READY);
         L1ReadyQueue->Insert(thread);
         //dealing with preemptive SRTN
@@ -146,19 +146,19 @@ Scheduler::FindNextToRun ()
     if(!L1ReadyQueue->IsEmpty())
     {
         thread = L1ReadyQueue->RemoveFront();
-        DEBUG('z',"[RemoveFromQueue] Tick ["<<kernel->stats->totalTicks<<"]: Thread ["<<thread->getID()<<"] removed from queue L[1]\n");
+        DEBUG('z',"[RemoveFromQueue] Tick ["<<kernel->stats->totalTicks<<"]: Thread ["<<thread->getID()<<"] removed from queue L[1]");
         return thread;
     }
     else if(!L2ReadyQueue->IsEmpty())
     {
         thread = L2ReadyQueue->RemoveFront();
-        DEBUG('z',"[RemoveFromQueue] Tick ["<<kernel->stats->totalTicks<<"]: Thread ["<<thread->getID()<<"] removed from queue L[2]\n");
+        DEBUG('z',"[RemoveFromQueue] Tick ["<<kernel->stats->totalTicks<<"]: Thread ["<<thread->getID()<<"] removed from queue L[2]");
         return thread;
     }
     else if(!L3ReadyQueue->IsEmpty())
     {
         thread = L3ReadyQueue->RemoveFront();
-        DEBUG('z',"[RemoveFromQueue] Tick ["<<kernel->stats->totalTicks<<"]: Thread ["<<thread->getID()<<"] removed from queue L[3]\n");
+        DEBUG('z',"[RemoveFromQueue] Tick ["<<kernel->stats->totalTicks<<"]: Thread ["<<thread->getID()<<"] removed from queue L[3]");
         return thread;
     }
     else return NULL;
@@ -296,14 +296,14 @@ Scheduler::UpdatePriority()
         {
             int Priority=thread->getPriority();
             thread->setPriority(Priority+10);
-            DEBUG('z',"[UpdatePriority] Tick ["<<kernel->stats->totalTicks<<"]: Thread ["<<thread->getID()<<"] changes its priority from ["<<Priority<<"] to ["<<Priority+10<<"]\n");
+            DEBUG('z',"[UpdatePriority] Tick ["<<kernel->stats->totalTicks<<"]: Thread ["<<thread->getID()<<"] changes its priority from ["<<Priority<<"] to ["<<Priority+10<<"]");
             thread->setWaitTime(0);
         }
         if (thread->getPriority() >49) {
             L3ReadyQueue->Remove(thread);
-            DEBUG('z',"[RemoveFromQueue] Tick ["<<kernel->stats->totalTicks<<"]: Thread ["<<thread->getID()<<"] removed from queue L[3]\n");
+            DEBUG('z',"[RemoveFromQueue] Tick ["<<kernel->stats->totalTicks<<"]: Thread ["<<thread->getID()<<"] removed from queue L[3]");
             L2ReadyQueue->Insert(thread);
-            DEBUG('z',"[RemoveFromQueue] Tick ["<<kernel->stats->totalTicks<<"]: Thread ["<<thread->getID()<<"] is insert into queue L[2]\n");
+            DEBUG('z',"[RemoveFromQueue] Tick ["<<kernel->stats->totalTicks<<"]: Thread ["<<thread->getID()<<"] is insert into queue L[2]");
         }
         iterL3->Next();
     }
@@ -319,15 +319,15 @@ Scheduler::UpdatePriority()
         {
             int Priority=thread->getPriority();
             thread->setPriority(Priority+10);
-            DEBUG('z',"[UpdatePriority] Tick ["<<kernel->stats->totalTicks<<"]: Thread ["<<thread->getID()<<"] changes its priority from ["<<Priority<<"] to ["<<Priority+10<<"]\n");
+            DEBUG('z',"[UpdatePriority] Tick ["<<kernel->stats->totalTicks<<"]: Thread ["<<thread->getID()<<"] changes its priority from ["<<Priority<<"] to ["<<Priority+10<<"]");
             thread->setWaitTime(0);
         }
         if (thread->getPriority() >99) 
         {
             L2ReadyQueue->Remove(thread);
-            DEBUG('z',"[RemoveFromQueue] Tick ["<<kernel->stats->totalTicks<<"]: Thread ["<<thread->getID()<<"] removed from queue L[2]\n");
+            DEBUG('z',"[RemoveFromQueue] Tick ["<<kernel->stats->totalTicks<<"]: Thread ["<<thread->getID()<<"] removed from queue L[2]");
             L1ReadyQueue->Insert(thread);
-            DEBUG('z',"[RemoveFromQueue] Tick ["<<kernel->stats->totalTicks<<"]: Thread ["<<thread->getID()<<"] is insert into queue L[1]\n");
+            DEBUG('z',"[RemoveFromQueue] Tick ["<<kernel->stats->totalTicks<<"]: Thread ["<<thread->getID()<<"] is insert into queue L[1]");
         }
         iterL2->Next();
     }
@@ -343,7 +343,7 @@ Scheduler::UpdatePriority()
         {
             int Priority=thread->getPriority();
             thread->setPriority(Priority+10);
-            DEBUG('z',"[UpdatePriority] Tick ["<<kernel->stats->totalTicks<<"]: Thread ["<<thread->getID()<<"] changes its priority from ["<<Priority<<"] to ["<<Priority+10<<"]\n");
+            DEBUG('z',"[UpdatePriority] Tick ["<<kernel->stats->totalTicks<<"]: Thread ["<<thread->getID()<<"] changes its priority from ["<<Priority<<"] to ["<<Priority+10<<"]");
         }
         iterL1->Next();
     }
