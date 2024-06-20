@@ -213,11 +213,17 @@ Thread::Yield ()
     
     DEBUG(dbgThread, "Yielding thread: " << name << ", ID: " << ID);
     
-    //<TODO>
+    //<TODO>(Wait debug)
     // 1. Put current_thread in running state to ready state
+    kernel->scheduler->ReadyToRun(this);
     // 2. Then, find next thread from ready state to push on running state
+    nextThread = kernel->scheduler->FindNextToRun();
     // 3. After resetting some value of current_thread, then context switch
-    kernel->scheduler->Run(nextThread, finishing);
+    this->setStatus(READY);
+    this->setRemainingBurstTime(this->getRemainingBurstTime() - this->getRunTime()); // update remaining burst time
+    this->setRunTime(0); // reset runtime for currentthread
+    this->setWaitTime(0); // reset waittime for currentthread
+    kernel->scheduler->Run(nextThread, 0); // finishing = 0
     //<TODO>
 
     (void) kernel->interrupt->SetLevel(oldLevel);
@@ -257,11 +263,15 @@ Thread::Sleep (bool finishing)
     while ((nextThread = kernel->scheduler->FindNextToRun()) == NULL)
 	    kernel->interrupt->Idle();	// no one to run, wait for an interruptd
 
-    //<TODO>
+    //<TODO>(wait debug)
     // In Thread::Sleep(finishing), we put the current_thread to waiting or terminated state (depend on finishing)
     // , and determine finishing on Scheduler::Run(nextThread, finishing), not here.
     // 1. Update RemainingBurstTime
+    this->setRemainingBurstTime(this->getRemainingBurstTime() - this->getRunTime());
     // 2. Reset some value of current_thread, then context switch
+    this->setStatus(BLOCKED);
+    this->setRunTime(0);
+    this->setWaitTime(0);
     kernel->scheduler->Run(nextThread, finishing);
     //<TODO>
 }
@@ -274,7 +284,7 @@ Thread::Sleep (bool finishing)
 //	member function.
 //----------------------------------------------------------------------
 
-static void ThreadFinish()    { kernel->currentThread->Finish(); }
+static void ThreadFinish() { kernel->currentThread->Finish(); }
 static void ThreadBegin() { kernel->currentThread->Begin(); }
 void ThreadPrint(Thread *t) { t->Print(); }
 

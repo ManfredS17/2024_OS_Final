@@ -30,24 +30,30 @@
 //----------------------------------------------------------------------
 
 
-
-//<TODO>
+//<TODO>(Wait debug)
 // Declare sorting rule of SortedList for L1 & L2 ReadyQueue
 // Hint: Funtion Type should be "static int"
+static int cmpRemainingBurstTime(Thread* a, Thread* b)
+{
+    return (a->getRemainingBurstTime() < b->getRemainingBurstTime()) ? 1 : -1;
+}
+
+static int cmpID(Thread* a, Thread* b)
+{
+    return (a->getID() < b->getID()) ? 1 : -1;
+}
+
 //<TODO>
-int CompRemaingTime(Thread* A, Thread* B){
-    return A->getRemainingBurstTime()-B->getRemainingBurstTime();
-}
-int CompID(Thread* A, Thread* B){
-    return A->getID()-B->getID();
-}
-Scheduler::Scheduler(){
+
+Scheduler::Scheduler()
+{
 //	schedulerType = type;
-    //<TODO>
+    // readyList = new List<Thread *>; 
+    //<TODO>(Wait debug)
     // Initialize L1, L2, L3 ReadyQueue
-    L1ReadyQueue = new SortedList<Thread *>(CompRemainTime);
-    L2ReadyQueue = new SortedList<Thread *>(CompID);
-    L3ReadyQueue = new List<Thread *>;
+	L1ReadyQueue = new SortedList<Thread*>(cmpRemainingBurstTime);
+    L2ReadyQueue = new SortedList<Thread*>(cmpID);
+    L3ReadyQueue = new List<Thread*>;
     //<TODO>
 	toBeDestroyed = NULL;
 } 
@@ -57,11 +63,13 @@ Scheduler::Scheduler(){
 // 	De-allocate the list of ready threads.
 //----------------------------------------------------------------------
 
-Scheduler::~Scheduler(){ 
-    //<TODO>
+Scheduler::~Scheduler()
+{ 
+    //<TODO>(Wait debug)
     // Remove L1, L2, L3 ReadyQueue
-    delete L1ReadyQueue,L2ReadyQueue,L3ReadyQueue;
-    //<TODO>    
+    delete L1ReadyQueue, L2ReadyQueue, L3ReadyQueue;
+    //<TODO>
+    // delete readyList; 
 } 
 
 //----------------------------------------------------------------------
@@ -77,24 +85,39 @@ Scheduler::ReadyToRun (Thread *thread)
 {
     ASSERT(kernel->interrupt->getLevel() == IntOff);
     // DEBUG(dbgThread, "Putting thread on ready list: " << thread->getName());
-     Statistics* stats = kernel->stats;
-    //<TODO>
-    int Priority=thread->getPriority();
+
+    Statistics* stats = kernel->stats;
+    //<TODO>(wait debug)
     // According to priority of Thread, put them into corresponding ReadyQueue.
-    if(Priority>=0&&Priority<50)
-        L3ReadyQueue->Append(thread);
-    else if(Priority<100)
-        L2ReadyQueue->Insert(thread);
-    else if(Priority<150){
-        if (!L1ReadyQueue->IsEmpty() && L1ReadyQueue->Front()->getRemainingBurstTime() > thread->getRemainingBurstTime()) {
-            kernel->currentThread->Yield();
-        }
-        L1ReadyQueue->Insert(thread);
-    }
     // After inserting Thread into ReadyQueue, don't forget to reset some values.
     // Hint: L1 ReadyQueue is preemptive SRTN(Shortest Remaining Time Next).
     // When putting a new thread into L1 ReadyQueue, you need to check whether preemption or not.
-    //<TODO>    
+    int Priority=thread->getPriority();
+    if(Priority >=0 && Priority < 50)
+    {
+        printf("Tick [%d]: Thread [%d] is inserted into queue L3\n", kernel->stats->totalTicks, thread->getID);
+        thread->setStatus(READY);
+        L3ReadyQueue->Append(thread);
+    }
+    else if(Priority < 100)
+    {
+        printf("Tick [%d]: Thread [%d] is inserted into queue L2\n", kernel->stats->totalTicks, thread->getID);
+        thread->setStatus(READY);
+        L2ReadyQueue->Insert(thread);
+    }
+    else if(Priority < 150)
+    {
+        printf("Tick [%d]: Thread [%d] is inserted into queue L1\n", kernel->stats->totalTicks, thread->getID);
+        thread->setStatus(READY);
+        L1ReadyQueue->Insert(thread);
+        //dealing with preemptive SRTN
+        if (!L1ReadyQueue->IsEmpty() && L1ReadyQueue->Front()->getRemainingBurstTime() > thread->getRemainingBurstTime())
+        {
+            kernel->currentThread->Yield();
+        }
+    }
+    //<TODO>
+    // readyList->Append(thread);
 }
 
 //----------------------------------------------------------------------
@@ -109,15 +132,37 @@ Thread *
 Scheduler::FindNextToRun ()
 {
     ASSERT(kernel->interrupt->getLevel() == IntOff);
-    if (!L1ReadyQueue->IsEmpty()) {
-        return L1ReadyQueue->RemoveFront();
-    } else if (!L2ReadyQueue->IsEmpty()) {
-        return L2ReadyQueue->RemoveFront();
-    } else if (!L3ReadyQueue->IsEmpty()) {
-        return L3ReadyQueue->RemoveFront();
+
+    /*if (readyList->IsEmpty()) {
+    return NULL;
     } else {
-        return nullptr;
+        return readyList->RemoveFront();
+    }*/
+
+    //<TODO>(Not finished)
+    // a.k.a. Find Next (Thread in ReadyQueue) to Run
+    Thread* thread;
+
+    if(!L1ReadyQueue->IsEmpty())
+    {
+        thread = L1ReadyQueue->RemoveFront();
+        printf("Tick [%d]: Thread [%d] is removed from queue L1", kernel->stats->totalTicks, thread->getID());
+        return thread;
     }
+    else if(!L2ReadyQueue->IsEmpty())
+    {
+        thread = L2ReadyQueue->RemoveFront();
+        printf("Tick [%d]: Thread [%d] is removed from queue L2", kernel->stats->totalTicks, thread->getID());
+        return thread;
+    }
+    else if(!L3ReadyQueue->IsEmpty())
+    {
+        thread = L3ReadyQueue->RemoveFront();
+        printf("Tick [%d]: Thread [%d] is removed from queue L3", kernel->stats->totalTicks, thread->getID());
+        return thread;
+    }
+    else return NULL;
+    //<TODO>
 }
 
 //----------------------------------------------------------------------
@@ -218,15 +263,15 @@ Scheduler::CheckToBeDestroyed()
 //	the ready list.  For debugging.
 //----------------------------------------------------------------------
 void
-Scheduler::Print(){
-    cout << "Ready list contents:\n";
-    // readyList->Apply(ThreadPrint);
+Scheduler::Print()
+{
+    cout <<->Apply(ThreadPrint);
     L1ReadyQueue->Apply(ThreadPrint);
     L2ReadyQueue->Apply(ThreadPrint);
     L3ReadyQueue->Apply(ThreadPrint);
 }
 
-// <TODO>
+// <TODO> (wait debug)
 
 // Function 1. Function definition of sorting rule of L1 ReadyQueue
 
@@ -239,13 +284,16 @@ Scheduler::Print(){
 // 3. After aging, Thread may insert to different ReadyQueue
 
 void 
-Scheduler::UpdatePriority(){
+Scheduler::UpdatePriority()
+{
     ListIterator<Thread*>* iterL3 = new ListIterator<Thread*>(L3ReadyQueue);
     //For all jobs in L1
-    while (!iterL3->IsDone()) {
+    while (!iterL3->IsDone()) 
+    {
         Thread* thread = iterL3->Item();
-        thread->setWaitTime(thread->getWaitTime()+1);
-        if (thread->getWaitTime() > 400) {
+        thread->setWaitTime(thread->getWaitTime()+100);
+        if (thread->getWaitTime() > 400) 
+        {
             thread->setPriority(thread->getPriority()+10);
             thread->setWaitTime(0);
         }
@@ -257,14 +305,17 @@ Scheduler::UpdatePriority(){
     delete iterL3;
 
     ListIterator<Thread*>* iterL2 = new ListIterator<Thread*>(L2ReadyQueue);
-    while (!iterL2->IsDone()) {
+    while (!iterL2->IsDone()) 
+    {
         Thread* thread = iterL2->Item();
-        thread->setWaitTime(thread->getWaitTime()+1);
-        if (thread->getWaitTime() > 400) {
+        thread->setWaitTime(thread->getWaitTime()+100);
+        if (thread->getWaitTime() > 400) 
+        {
             thread->setPriority(thread->getPriority()+10);
             thread->setWaitTime(0);
         }
-        if (thread->getPriority() >99) {
+        if (thread->getPriority() >99) 
+        {
             L1ReadyQueue->Insert(thread);
         }
         iterL2->Next();
@@ -273,10 +324,12 @@ Scheduler::UpdatePriority(){
 
 
     ListIterator<Thread*>* iterL1 = new ListIterator<Thread*>(L1ReadyQueue);
-    while (!iterL1->IsDone()) {
+    while (!iterL1->IsDone()) 
+    {
         Thread* thread = iterL1->Item();
-        thread->setWaitTime(thread->getWaitTime+1);
-        if (thread->getWaitTime() > 400) {
+        thread->setWaitTime(thread->getWaitTime+100);
+        if (thread->getWaitTime() > 400) 
+        {
             thread->increasePriority(10);
             thread->resetWaitTime();
         }

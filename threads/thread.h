@@ -111,14 +111,25 @@ class Thread {
     char* getName() { return (name); }
     void Print() { cout << name; }
     void SelfTest();		// test whether thread impl is working
-    //<TODO>
+    //<TODO>(wait debug)
     // Set & Get the value in Class Thread
     // 1. get ID
+	int getID() { return this->ID; }
     // 2. set/get Priority
+	void setPriority(int num) { this->Priority = num; }
+	int getPriority() { return this->Priority; }
     // 3. set/get WaitTime
+	void setWaitTime(int num) { this->WaitTime = num; }
+	int getWaitTime() { return this->WaitTime; }
     // 4. set/get RemainingBurstTime
+	void setRemainingBurstTime(int num) { this->RemainingBurstTime = num; }
+	int getRemainingBurstTime() { return this->RemainingBurstTime; }
     // 5. set/get RunTime
+	void setRunTime(int num) { this->RunTime = num; }
+	int getRunTime() { return this->RunTime; }
     // 6. set/get RRTime
+	void setRRTime(int num) { this->RRTime = num; }
+	int getRRTime() { return this->RRTime; }
     //<TODO>
 
   private:

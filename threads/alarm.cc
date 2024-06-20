@@ -23,7 +23,6 @@
 Alarm::Alarm(bool doRandom)
 {
     timer = new Timer(doRandom, this);
-    tickCounter = 0;
 }
 
 //----------------------------------------------------------------------
@@ -52,29 +51,32 @@ Alarm::CallBack()
 {
     Interrupt *interrupt = kernel->interrupt;
     MachineStatus status = interrupt->getStatus();
-    Statistics* stats = kernel->stats;
 
-    //<TODO>
+    Thread* thread = kernel->currentThread;
+
+    //<TODO>(wait debug)
+
     // In each 100 ticks, 
-    if (stats->totalTicks % 100 == 0&& stats->totalTicks != 0) {
-    // 1. Update Priority
-    kernel->scheduler->UpdatePriority();
-    // 2. Update RunTime & RRTime
-    
-    // 3. Check Round Robin
+    if (stats->totalTicks % 100 == 0 && stats->totalTicks != 0)
+    {
+        // 1. Update Priority
+        kernel->scheduler->UpdatePriority();
+        // 2. Update RunTime & RRTime
+        thread->setRunTime(thread->getRunTime() + 100);
+        // 3. Check Round Robin (only L3)
+        if(thread->getPriority() < 50 && thread->getRunTime() >= 200)
+        {
+            thread->Yield();
+        }
     }
-
-
-
     //<TODO>
     
-    if (status == IdleMode) {    // is it time to quit?
-        if (!interrupt->AnyFutureInterrupts()) {
-            timer->Disable(); // turn off the timer
-    }
-    } else {         // there's someone to preempt
-        interrupt->YieldOnReturn();
-    }
+     //    if (status == IdleMode) {    // is it time to quit?
+ //        if (!interrupt->AnyFutureInterrupts()) {
+    //        timer->Disable(); // turn off the timer
+    // }
+ //    } else {         // there's someone to preempt
+    //    interrupt->YieldOnReturn();
+ //    }
 }
-
 
