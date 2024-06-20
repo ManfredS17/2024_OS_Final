@@ -52,10 +52,11 @@ Alarm::CallBack()
     Interrupt *interrupt = kernel->interrupt;
     MachineStatus status = interrupt->getStatus();
 
+
     Thread* thread = kernel->currentThread;
 
     //<TODO>(wait debug)
-
+    Statistics* stats = kernel->stats;
     // In each 100 ticks, 
     if (stats->totalTicks % 100 == 0 && stats->totalTicks != 0)
     {
@@ -71,12 +72,12 @@ Alarm::CallBack()
     }
     //<TODO>
     
-     //    if (status == IdleMode) {    // is it time to quit?
- //        if (!interrupt->AnyFutureInterrupts()) {
-    //        timer->Disable(); // turn off the timer
-    // }
- //    } else {         // there's someone to preempt
-    //    interrupt->YieldOnReturn();
- //    }
+    if (status == IdleMode) {    // is it time to quit?
+         if (!interrupt->AnyFutureInterrupts()) {
+            timer->Disable(); // turn off the timer
+     }
+     } else {         // there's someone to preempt
+        interrupt->YieldOnReturn();
+     }
 }
 

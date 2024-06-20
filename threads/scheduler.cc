@@ -95,19 +95,19 @@ Scheduler::ReadyToRun (Thread *thread)
     int Priority=thread->getPriority();
     if(Priority >=0 && Priority < 50)
     {
-        printf("Tick [%d]: Thread [%d] is inserted into queue L3\n", kernel->stats->totalTicks, thread->getID);
+        printf("Tick [%d]: Thread [%d] is inserted into queue L3\n", kernel->stats->totalTicks, thread->getID());
         thread->setStatus(READY);
         L3ReadyQueue->Append(thread);
     }
     else if(Priority < 100)
     {
-        printf("Tick [%d]: Thread [%d] is inserted into queue L2\n", kernel->stats->totalTicks, thread->getID);
+        printf("Tick [%d]: Thread [%d] is inserted into queue L2\n", kernel->stats->totalTicks, thread->getID());
         thread->setStatus(READY);
         L2ReadyQueue->Insert(thread);
     }
     else if(Priority < 150)
     {
-        printf("Tick [%d]: Thread [%d] is inserted into queue L1\n", kernel->stats->totalTicks, thread->getID);
+        printf("Tick [%d]: Thread [%d] is inserted into queue L1\n", kernel->stats->totalTicks, thread->getID());
         thread->setStatus(READY);
         L1ReadyQueue->Insert(thread);
         //dealing with preemptive SRTN
@@ -265,7 +265,7 @@ Scheduler::CheckToBeDestroyed()
 void
 Scheduler::Print()
 {
-    cout <<->Apply(ThreadPrint);
+    //cout << "Ready list contents:\n";
     L1ReadyQueue->Apply(ThreadPrint);
     L2ReadyQueue->Apply(ThreadPrint);
     L3ReadyQueue->Apply(ThreadPrint);
@@ -327,13 +327,13 @@ Scheduler::UpdatePriority()
     while (!iterL1->IsDone()) 
     {
         Thread* thread = iterL1->Item();
-        thread->setWaitTime(thread->getWaitTime+100);
+        thread->setWaitTime(thread->getWaitTime()+100);
         if (thread->getWaitTime() > 400) 
         {
-            thread->increasePriority(10);
-            thread->resetWaitTime();
+            thread->setPriority(thread->getPriority()+10);
+            thread->setWaitTime(0);
         }
-        iterL1>Next();
+        iterL1->Next();
     }
     delete iterL1;
 }
